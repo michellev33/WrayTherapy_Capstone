@@ -1,5 +1,5 @@
 import { JetLagTouchReceiver, JetLagTouchScreen } from "../support/Interfaces";
-import * as Hammer from 'hammerjs';
+import 'hammerjs';
 
 /**
  * TouchScreen abstracts away how gestures (pan, swipe, tap, rotate, pinch,

@@ -5,7 +5,8 @@ import { Camera } from "../support/Camera"
 import { PointToActorCallback } from "../support/PointToActorCallback"
 import { JetLagRenderer, JetLagDevice, Renderable } from "../support/Interfaces";
 import { JetLagConfig } from "../../support/JetLagConfig";
-import { b2World, b2Vec2 } from "box2d.ts";
+import { XY } from "../support/XY";
+import { PhysicsType2d } from "../support/XY";
 
 /**
  * BaseScene represents an interactive, dynamic, visible portion of a game.
@@ -22,7 +23,7 @@ import { b2World, b2Vec2 } from "box2d.ts";
  */
 export abstract class BaseScene {
   /** The physics world in which all actors interact */
-  protected readonly world: b2World;
+  protected readonly world: PhysicsType2d.Dynamics.World;
 
   /** 
    * Anything in the world that can be rendered, in 5 planes [-2, -1, 0, 1, 2] 
@@ -58,7 +59,7 @@ export abstract class BaseScene {
     this.camera = new Camera(w, h, this.config.pixelMeterRatio, config, device.getConsole());
 
     // create a world with no default gravitational forces
-    this.world = new b2World(new b2Vec2(0, 0));
+    this.world = new PhysicsType2d.Dynamics.World(new XY(0, 0));
 
     // set up the containers for holding anything we can render
     this.renderables = new Array<Array<Renderable>>(5);
@@ -255,14 +256,35 @@ export abstract class BaseScene {
    * @param newYGravity The new force in the Y direction
    */
   public setGravity(newXGravity: number, newYGravity: number): void {
-    this.world.SetGravity(new b2Vec2(newXGravity, newYGravity));
+    this.world.SetGravity(new XY(newXGravity, newYGravity));
   }
 
-  /** 
-   * Return the box2d physics world, so that we can use it to create and destroy
-   * bodies, joints, etc.
+  /**
+   * Create a physics body in the world
+   * 
+   * @param def The definition of the body to create
    */
-  public getWorld() { return this.world; }
+  public createBody(def: PhysicsType2d.Dynamics.BodyDefinition) {
+    return this.world.CreateBody(def);
+  }
+
+  /**
+   * Create a physics joint in the world
+   * 
+   * @param def The definition of the joint to create
+   */
+  public createJoint(def: PhysicsType2d.Dynamics.Joints.JointDefinition) {
+    return this.world.CreateJoint(def);
+  }
+
+  /**
+   * Remove a physics joint from the world
+   * 
+   * @param joint The joint to remove
+   */
+  public destroyJoint(joint: PhysicsType2d.Dynamics.Joints.Joint) {
+    this.world.DestroyJoint(joint);
+  }
 
   /**
    * Add an image to the scene.  The image will not have any physics attached to

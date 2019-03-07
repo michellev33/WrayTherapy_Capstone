@@ -1,7 +1,7 @@
 import { BaseActor } from "../../actor/BaseActor"
 import { JetLagConsole } from "./Interfaces";
 import { Path } from "../../support/Path";
-import { b2Vec2, b2Transform } from "box2d.ts";
+import { XY } from "./XY";
 
 /**
  * PathDriver is an internal class, used to determine placement for an actor
@@ -43,9 +43,7 @@ export class PathDriver {
         // move to the starting point
         let r = this.path.getPoint(0);
         // convert start point from topleft to center, move actor to it
-        let xform = new b2Transform();
-        xform.SetPositionAngle(new b2Vec2(r.x + this.actor.getWidth() / 2, r.y + this.actor.getHeight() / 2), 0);
-        this.actor.getBody().SetTransform(xform);
+        this.actor.getBody().SetTransform(new XY(r.x + this.actor.getWidth() / 2, r.y + this.actor.getHeight() / 2), 0);
         // set up our next goal, start moving toward it
         this.nextIndex = 1;
         let p = this.path.getPoint(this.nextIndex)
@@ -53,7 +51,7 @@ export class PathDriver {
         p.x -= this.actor.getXPosition();
         p.y -= this.actor.getYPosition();
         p.Normalize();
-        p = p.SelfMul(this.velocity);
+        p = p.Multiply(this.velocity);
         console.log(p);
         this.actor.updateVelocity(p.x, p.y);
     }
@@ -102,7 +100,7 @@ export class PathDriver {
             p.x -= this.actor.getXPosition();
             p.y -= this.actor.getYPosition();
             p.Normalize();
-            p = p.SelfMul(this.velocity);
+            p = p.Multiply(this.velocity);
             this.actor.updateVelocity(p.x, p.y);
         }
     }

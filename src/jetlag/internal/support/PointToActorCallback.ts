@@ -1,28 +1,26 @@
 import { BaseActor } from "../../actor/BaseActor"
-import { b2AABB, b2Fixture, b2World, b2QueryCallback, b2Vec2 } from "box2d.ts";
+import { XY } from "./XY";
+import { PhysicsType2d } from "./XY";
 
 /**
  * PointToActorCallback is used by PhysicsType2d to determine if a coordinate in
  * the world corresponds to a BaseActor.
  */
-export class PointToActorCallback extends b2QueryCallback {
+export class PointToActorCallback implements PhysicsType2d.Dynamics.IQueryCallback {
     /** If we found an actor, we'll put it here */
     private foundActor: BaseActor = null;
 
     /** A helper vector for tracking the location that is being queried */
-    private touchVector = new b2Vec2(0, 0);
+    private touchVector = new XY(0, 0);
 
     /** The tolerance when looking in a region around a point */
     private readonly delta = .1;
 
     /** The bounding box around the point that is being tested */
-    private aabb = new b2AABB();
+    private aabb = new PhysicsType2d.Collision.AxisAlignedBoundingBox();
 
     /** Destructor is a no-op for our use of the IQueryCallback interface */
     Destructor(): void { }
-
-    /** Default constructor just forwards to super */
-    constructor() { super(); }
 
     /**
      * ReportFixture is used by PhysicsType2d to see if the fixture that was
@@ -35,7 +33,7 @@ export class PointToActorCallback extends b2QueryCallback {
      * @returns True if the fixture isn't satisfactory, and the search should
      *          continue
      */
-    ReportFixture(fixture: b2Fixture) {
+    ReportFixture(fixture: PhysicsType2d.Dynamics.Fixture) {
         // Our only requirement is that the BaseActor associated with the
         // fixture must be active
         if (fixture.TestPoint(this.touchVector)) {
@@ -61,7 +59,7 @@ export class PointToActorCallback extends b2QueryCallback {
      * @param x The X coordinate of the search, in meters
      * @param y The Y coordinate of the search, in meters
      */
-    query(x: number, y: number, world: b2World) {
+    query(x: number, y: number, world: PhysicsType2d.Dynamics.World) {
         this.foundActor = null;
         this.touchVector.x = x;
         this.touchVector.y = y;

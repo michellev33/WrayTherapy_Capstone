@@ -36,7 +36,10 @@ export class GameConfig extends JetLagConfig {
     this.storageKey = "com.me.myjetlaggame.prefs";
 
     // Set up the resource prefix
-    this.resourcePrefix = "./assets/";
+    //
+    // Note: this only works for the base JetLag code.  If you want to do your own game, 
+    // you'll need to stop working with StackBlitz, because it doesn't support assets yet.
+    this.resourcePrefix = "https://raw.githubusercontent.com/mfs409/jetlag/master/assets/";
 
     // list the images that the game will use
     this.imageNames = [

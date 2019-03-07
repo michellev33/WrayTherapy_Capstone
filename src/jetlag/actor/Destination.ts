@@ -2,7 +2,6 @@ import { WorldActor } from "./WorldActor"
 import { Hero } from "./Hero"
 import { JetLagSound } from "../internal/support/Interfaces";
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact } from "box2d.ts";
 
 /**
  * Destinations are actors that the Hero should try to reach. When a Hero
@@ -90,7 +89,7 @@ export class Destination extends WorldActor {
      * @param other   Other actor involved in this collision
      * @param contact A description of the collision
      */
-    onCollide(other: WorldActor, contact: b2Contact) { }
+    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) { }
 
     /**
      * Change the number of heroes that can be accepted by this destination (the

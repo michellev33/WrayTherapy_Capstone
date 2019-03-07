@@ -3,7 +3,6 @@ import { Hero } from "./Hero"
 import { Obstacle } from "./Obstacle"
 import { Projectile } from "./Projectile"
 import { JetLagStage } from "../internal/JetLagStage";
-import { b2Contact } from "box2d.ts";
 
 /**
  * Enemies are things to be avoided or defeated by the Hero. Enemies do damage
@@ -106,7 +105,7 @@ export class Enemy extends WorldActor {
      * @param other   Other actor involved in this collision
      * @param contact A description of the collision
      */
-    onCollide(other: WorldActor, contact: b2Contact) {
+    onCollide(other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // collision with obstacles
         if (other instanceof Obstacle)
             this.onCollideWithObstacle(other as Obstacle, contact);
@@ -151,7 +150,7 @@ export class Enemy extends WorldActor {
      * @param obstacle The obstacle with which this Enemy collided
      * @param contact A description of the collision
      */
-    private onCollideWithObstacle(obstacle: Obstacle, contact: b2Contact) {
+    private onCollideWithObstacle(obstacle: Obstacle, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // handle any callbacks the obstacle has
         if (obstacle.getEnemyCollisionCallback() != null)
             obstacle.getEnemyCollisionCallback()(obstacle, this, contact);

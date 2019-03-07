@@ -4,10 +4,10 @@ import { Hero } from "../../actor/Hero"
 import { Enemy } from "../../actor/Enemy"
 import { Projectile } from "../../actor/Projectile"
 import { JetLagRenderer, JetLagDevice } from "../support/Interfaces"
+import { XY } from "../support/XY"
 import { JetLagConfig } from "../../support/JetLagConfig";
 import { Obstacle } from "../../actor/Obstacle";
-import "box2d.ts";
-import { b2Vec2, b2ContactListener, b2Contact, b2ContactImpulse, b2Manifold, b2WorldManifold, b2DistanceJointDef, b2DistanceJoint } from "box2d.ts";
+import { PhysicsType2d } from "../support/XY";
 
 /**
  * WorldScene manages everything related to the core gameplay of a level.  It
@@ -19,7 +19,7 @@ export class WorldScene extends BaseScene {
     private readonly tiltActors: WorldActor[] = [];
 
     /** Magnitude of the maximum gravity the accelerometer can create */
-    private readonly tiltMax = new b2Vec2(0, 0);
+    private readonly tiltMax = new XY(0, 0);
 
     /**
      * Track if we have an override for gravity to be translated into velocity 
@@ -36,7 +36,7 @@ export class WorldScene extends BaseScene {
     private cameraChaseActor: WorldActor = null;
 
     /** A temp vector, to avoid allocation in the tilt code */
-    private tiltVec = new b2Vec2(0, 0);
+    private tiltVec = new XY(0, 0);
 
     /**
      * Construct a World for the current level.  The World will have a camera,
@@ -60,7 +60,7 @@ export class WorldScene extends BaseScene {
             return;
 
         // store the accelerometer forces we measure
-        let gravity = new b2Vec2(x, y);
+        let gravity = new XY(x, y);
 
         // Apply the gravity multiplier
         gravity.x *= this.tiltMultiplier;
@@ -113,7 +113,7 @@ export class WorldScene extends BaseScene {
     /** Configure collision handling for the current level */
     private configureCollisionHandlers() {
         // set up the collision handlers
-        this.world.SetContactListener(new (class myContactListener extends b2ContactListener {
+        this.world.SetContactListener(new (class myContactListener extends PhysicsType2d.Dynamics.ContactListener {
             scene: WorldScene;
             constructor(scene: WorldScene) {
                 super();
@@ -126,7 +126,7 @@ export class WorldScene extends BaseScene {
              *
              * @param contact A description of the contact event
              */
-            public BeginContact(contact: b2Contact) {
+            public BeginContact(contact: PhysicsType2d.Dynamics.Contacts.Contact) {
                 // Get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData(); //any type
                 let b = contact.GetFixtureB().GetBody().GetUserData(); //any type
@@ -186,7 +186,7 @@ export class WorldScene extends BaseScene {
              *
              * @param contact A description of the contact event
              */
-            public EndContact(contact: b2Contact) {
+            public EndContact(contact: PhysicsType2d.Dynamics.Contacts.Contact) {
             }
 
             /**
@@ -196,7 +196,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param oldManifold The manifold from the previous world step
              */
-            public PreSolve(contact: b2Contact, oldManifold: b2Manifold) {
+            public PreSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, oldManifold: PhysicsType2d.Collision.Manifold) {
                 // get the bodies, make sure both are actors
                 let a = contact.GetFixtureA().GetBody().GetUserData();
                 let b = contact.GetFixtureB().GetBody().GetUserData();
@@ -218,12 +218,10 @@ export class WorldScene extends BaseScene {
                 if (oneSided != null && other != null && !oneSided.getDistJoint() && !other.getDistJoint()) {
                     // if we're here, see if we should be disabling a one-sided
                     // obstacle collision
-                    let worldManiFold = new b2WorldManifold();
-                    contact.GetWorldManifold(worldManiFold);
+                    let worldManiFold = contact.GetWorldManifold();
                     let numPoints = worldManiFold.points.length;
                     for (let i = 0; i < numPoints; i++) {
-                        let xy = new b2Vec2(0, 0);
-                        other.getBody().GetLinearVelocityFromWorldPoint(worldManiFold.points[i], xy);
+                        let xy = other.getBody().GetLinearVelocityFromWorldPoint(worldManiFold.points[i]);
                         // disable based on the value of isOneSided and the
                         // vector between the actors
                         if (oneSided.getOneSided() == 0 && xy.y < 0) {
@@ -265,7 +263,7 @@ export class WorldScene extends BaseScene {
              * @param contact A description of the contact event
              * @param impulse The impulse of the contact
              */
-            public PostSolve(contact: b2Contact, impulse: b2ContactImpulse) {
+            public PostSolve(contact: PhysicsType2d.Dynamics.Contacts.Contact, impulse: PhysicsType2d.Dynamics.ContactImpulse) {
             }
         })(this));
     }
@@ -316,7 +314,7 @@ export class WorldScene extends BaseScene {
      * @param other   The other actor... it should always be a hero for now
      * @param contact A description of the contact event
      */
-    private handleSticky(sticky: WorldActor, other: WorldActor, contact: b2Contact) {
+    private handleSticky(sticky: WorldActor, other: WorldActor, contact: PhysicsType2d.Dynamics.Contacts.Contact) {
         // don't create a joint if we've already got one
         if (other.getDistJoint() != null)
             return;
@@ -332,15 +330,13 @@ export class WorldScene extends BaseScene {
             // create a distance joint. Note that this function runs during the
             // box2d step, so we need to make the joint in a callback that runs
             // later
-            let m = new b2WorldManifold();
-            contact.GetWorldManifold(m)
-            let v = m.points[0];
+            let v = contact.GetWorldManifold().points[0];
             this.oneTimeEvents.push(() => {
-                other.getBody().SetLinearVelocity(new b2Vec2(0, 0));
-                let d = new b2DistanceJointDef();
+                other.getBody().SetLinearVelocity(new XY(0, 0));
+                let d = new PhysicsType2d.Dynamics.Joints.DistanceJointDefinition();
                 d.Initialize(sticky.getBody(), other.getBody(), v, v);
                 d.collideConnected = true;
-                other.setImplicitDistJoint(this.world.CreateJoint(d) as b2DistanceJoint);
+                other.setImplicitDistJoint(this.world.CreateJoint(d) as PhysicsType2d.Dynamics.Joints.DistanceJoint);
             });
         }
     }
