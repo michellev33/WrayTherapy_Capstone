@@ -22,24 +22,25 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
 
     // draw the background. Note that "Play", "Help", and "Quit" are part of the
     // image.
-    jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "splash.png", z: -2 });
+    jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "splash_background.png", z: -1 });
+    //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "splash.png", z: -2 });
 
     // Place an invisible button over the "Play" text on the background image,
     // and set it up so that pressing it switches to the first page of the level
     // chooser.
-    jl.hud.addTapControl({ x: 6.75, y: 5, width: 2.5, height: 1.25, img: "" }, () => {
+    jl.hud.addTapControl({ x: 5.75, y: 4, width: 4.5, height: 1.25, img: "" }, () => {
         jl.nav.doChooser(1);
         return true;
     });
 
     // Do the same, but this button goes to the first help screen
-    jl.hud.addTapControl({ x: 2.3, y: 5.7, width: 1.8, height: .9, img: "" }, () => {
+    jl.hud.addTapControl({ x: 1.75, y: 4.25, width: 3, height: .9, img: "" }, () => {
         jl.nav.doHelp(1);
         return true;
     });
 
     // Set up the quit button
-    jl.hud.addTapControl({ x: 11.75, y: 5.75, width: 2, height: .9, img: "" }, () => {
+    jl.hud.addTapControl({ x: 10.75, y: 4.25, width: 3, height: .9, img: "" }, () => {
         jl.nav.doQuit();
         return true;
     });

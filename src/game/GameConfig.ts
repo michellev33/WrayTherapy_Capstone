@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = true;
+    this.debugMode = false; //this is the green lines
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
@@ -68,7 +68,9 @@ export class GameConfig extends JetLagConfig {
       "colorstar1.png", "colorstar2.png", "colorstar3.png", "colorstar4.png",
       "colorstar5.png", "colorstar6.png", "colorstar7.png", "colorstar8.png",
       // background noise, and buttons
-      "noise.png", "pause.png"
+      "noise.png", "pause.png",
+      //Game intro background
+      "planets.png", "planets_level.png", "splash_background.png"
     ];
 
     // list the sound effects that the game will use

@@ -24,41 +24,43 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     // individually place each button exactly where you want it.
     if (index == 1) {
         // set up background and music
-        jl.setMusic("tune.ogg");
-        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
+        //jl.setMusic("tune.ogg");
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "planets_level.png", z: -2 });
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         // We'll have margins of 1.25 on the left and right, a margin of 1 on
         // the bottom, and three rows of eight buttons each, with each button
         // 1.25x1.25 meters, and .5 meters between them
-        drawLevelButton(jl, 1.25, 3.25, 1.25, 1.25, 1);
-        drawLevelButton(jl, 3.00, 3.25, 1.25, 1.25, 2);
-        drawLevelButton(jl, 4.75, 3.25, 1.25, 1.25, 3);
-        drawLevelButton(jl, 6.50, 3.25, 1.25, 1.25, 4);
-        drawLevelButton(jl, 8.25, 3.25, 1.25, 1.25, 5);
-        drawLevelButton(jl, 10.00, 3.25, 1.25, 1.25, 6);
-        drawLevelButton(jl, 11.75, 3.25, 1.25, 1.25, 7);
-        drawLevelButton(jl, 13.50, 3.25, 1.25, 1.25, 8);
+        //drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, height: number, whichLevel: number)
+        drawLevelButton(jl, 2.80, 4.75, 2, 2, 1);
+        drawLevelButton(jl, 5.25, 2.50, 2, 2, 2);
+        drawLevelButton(jl, 8.50, 1.50, 2, 2, 3);
+        // drawLevelButton(jl, 6.50, 3.25, 1.25, 1.25, 4);
+        // drawLevelButton(jl, 8.25, 3.25, 1.25, 1.25, 5);
+        // drawLevelButton(jl, 10.00, 3.25, 1.25, 1.25, 6);
+        // drawLevelButton(jl, 11.75, 3.25, 1.25, 1.25, 7);
+        // drawLevelButton(jl, 13.50, 3.25, 1.25, 1.25, 8);
 
-        drawLevelButton(jl, 1.25, 5, 1.25, 1.25, 9);
-        drawLevelButton(jl, 3.00, 5, 1.25, 1.25, 10);
-        drawLevelButton(jl, 4.75, 5, 1.25, 1.25, 11);
-        drawLevelButton(jl, 6.50, 5, 1.25, 1.25, 12);
-        drawLevelButton(jl, 8.25, 5, 1.25, 1.25, 13);
-        drawLevelButton(jl, 10.00, 5, 1.25, 1.25, 14);
-        drawLevelButton(jl, 11.75, 5, 1.25, 1.25, 15);
-        drawLevelButton(jl, 13.50, 5, 1.25, 1.25, 16);
+        // drawLevelButton(jl, 1.25, 5, 1.25, 1.25, 9);
+        // drawLevelButton(jl, 3.00, 5, 1.25, 1.25, 10);
+        // drawLevelButton(jl, 4.75, 5, 1.25, 1.25, 11);
+        // drawLevelButton(jl, 6.50, 5, 1.25, 1.25, 12);
+        // drawLevelButton(jl, 8.25, 5, 1.25, 1.25, 13);
+        // drawLevelButton(jl, 10.00, 5, 1.25, 1.25, 14);
+        // drawLevelButton(jl, 11.75, 5, 1.25, 1.25, 15);
+        // drawLevelButton(jl, 13.50, 5, 1.25, 1.25, 16);
 
-        drawLevelButton(jl, 1.25, 6.75, 1.25, 1.25, 17);
-        drawLevelButton(jl, 3.00, 6.75, 1.25, 1.25, 18);
-        drawLevelButton(jl, 4.75, 6.75, 1.25, 1.25, 19);
-        drawLevelButton(jl, 6.50, 6.75, 1.25, 1.25, 20);
-        drawLevelButton(jl, 8.25, 6.75, 1.25, 1.25, 21);
-        drawLevelButton(jl, 10.00, 6.75, 1.25, 1.25, 22);
-        drawLevelButton(jl, 11.75, 6.75, 1.25, 1.25, 23);
-        drawLevelButton(jl, 13.50, 6.75, 1.25, 1.25, 24);
+        // drawLevelButton(jl, 1.25, 6.75, 1.25, 1.25, 17);
+        // drawLevelButton(jl, 3.00, 6.75, 1.25, 1.25, 18);
+        // drawLevelButton(jl, 4.75, 6.75, 1.25, 1.25, 19);
+        // drawLevelButton(jl, 6.50, 6.75, 1.25, 1.25, 20);
+        // drawLevelButton(jl, 8.25, 6.75, 1.25, 1.25, 21);
+        // drawLevelButton(jl, 10.00, 6.75, 1.25, 1.25, 22);
+        // drawLevelButton(jl, 11.75, 6.75, 1.25, 1.25, 23);
+        // drawLevelButton(jl, 13.50, 6.75, 1.25, 1.25, 24);
 
         // draw the navigation buttons
-        drawNextButton(jl, 15, 5.125, 1, 1, 2);
+        //drawNextButton(jl, 15, 5.125, 1, 1, 2);
         drawSplashButton(jl, 15, 8, 1, 1);
     }
 
@@ -96,11 +98,12 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
  */
 function drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, height: number, whichLevel: number): void {
     // for each button, start by drawing an obstacle
-    let tile = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "leveltile.png" });
+    //let tile = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height, img: "leveltile.png" });
+    let tile = jl.world.makeObstacle({ box: true, x: x, y: y, width: width, height: height});
 
     // attach a callback and print the level number with a touchCallback, and then put text on top of it
     tile.setTapHandler(() => { jl.nav.doLevel(whichLevel); return true; });
-    jl.world.addText({ center: true, x: x + width / 2, y: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => { return whichLevel + "" });
+    //jl.world.addText({ center: true, x: x + width / 2, y: y + width / 2, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => { return whichLevel + "" });
 }
 
 /**
