@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = false; //this is the green lines
+    this.debugMode = true; //this is the green lines
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
@@ -70,7 +70,13 @@ export class GameConfig extends JetLagConfig {
       // background noise, and buttons
       "noise.png", "pause.png",
       //Game intro background
-      "planets.png", "planets_level.png", "splash_background.png"
+      "planets.png", "planets_level.png", "splash_background.png",
+      //level 1 backgrounds
+      "lvl1_background.png", "lvl1_moon.png", "lvl1_stars.png",
+      //curriculum object
+      "question_box.png",
+      //question related pictures
+      "answer_bar.png", "question_bar.png"
     ];
 
     // list the sound effects that the game will use

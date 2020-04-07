@@ -25,7 +25,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // In this level, all we have is a hero (the green ball) who needs to make it to the destination (a mustard colored
     // ball). The game is configured to use tilt to control the world.  If you're running on a computer, arrow keys will
     // simulate tilt.
-    if (index == 1) {
+    if (index == 3) {
         // By default, we have a level that is 1600x900 pixels (16x9 meters), with no default gravitational forces
 
         // Turn on tilt support, and indicate that the maximum force is +/- 10 m/(s^2) in each of the X and Y dimensions
@@ -43,20 +43,231 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //
         // Note: the parameters to makeDestinationAsCircle() are the same as the parameters for making heroes.  If you
         // aren't sure what something means, hover your mouse over it and you'll get pop-up help
-        jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
-        jl.score.setVictoryDestination(1);
+       // jl.world.makeDestination({ x: 15, y: 8, width: .75, height: .75, img: "mustardball.png" });
+        //jl.score.setVictoryDestination(1);
 
         // Specify a message to print when the level is won
         //
         // Note: there is actually a lot of code behind making this message.  It all appears at the bottom of this file,
         // as a function.  Later, we'll  explore the function, and we will also see how to make different sorts of win
         // messages
+        //winMessage(jl, "Great Job");
+        //questionScreen(jl, "hello!");
+        jl.world.setCameraBounds(300000, 9);
+        //jl.world.resetGravity(0, 10);
+        welcomeMessage(jl, "Press to make the hero go up");
         winMessage(jl, "Great Job");
+        loseMessage(jl, "Try Again");
+        jl.world.drawBoundingBox(0, 0, 300000, 9, "", 0, 0, 0);
+
+        // make a hero
+        //let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
+        jl.world.setCameraChase(h);
+        //h.setAbsoluteVelocity(5, 0);
+        //h.disableRotation();
+       //h.setPhysics(.1, 0, 0);
+
+        // touching the screen makes the hero go upwards
+       //jl.hud.addToggleButton({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.makeYMotionAction(h, -5), jl.hud.makeYMotionAction(h, 0));
+
+        // set up our background, with a few layers
+        jl.world.setBackgroundColor(0x000000);
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 1);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+        // we win by collecting 10 goodies...
+        jl.score.setVictoryGoodies(10, 0, 0, 0);
+        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => jl.score.getGoodies1() + " goodies");
+
+        // now set up an obstacle and attach a callback to it
+        //
+        // Note that the obstacle needs to be final or we can't access it within the callback
+        let trigger = jl.world.makeObstacle({ box: true, x: 16, y: 5, width: 2, height: 2, img: "question_box.png" });
+        let lc =
+            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
+            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
+            // Also move the obstacle forward, so we can hit it again.
+            (thisActor: Obstacle, collideActor: Hero) => {
+                // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
+                //jl.world.makeEnemy({ x: trigger.getXPosition() + 8 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "redball.png" });
+                //jl.world.makeGoodie({ x: trigger.getXPosition() + 9 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "blueball.png" });
+                // move the trigger so we can hit it again
+                //trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
+
+                 // Create a pause scene that has a back button on it, and a button
+        // for pausing the level
+                //jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (hudX: number, hudY: number) => {
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
+                        
+                        overlay.addTapControl({ x: 3.05, y: 1.10, width: 10, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.nav.doChooser(1);
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 1.50, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "Question 1");
+                    
+                        overlay.addTapControl({ x: 3, y: 3.5, width: 10.00, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            //jl.nav.doChooser(1);
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 3.85, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #1");
+
+                        overlay.addTapControl({ x: 3, y: 4.75, width: 10, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.score.winLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 5.10, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #2");
+
+                        overlay.addTapControl({ x: 3, y: 6.00, width: 10, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                           // jl.score.winLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 6.36, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #3");
+
+                        overlay.addTapControl({ x: 3, y: 7.25, width: 10, height: 1.2, img: "answer_bar.png" }, () => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.score.loseLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 7.6, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #4");
+
+                        // overlay.addTapControl({ x: 7, y: 1, width: 1, height: 1, img: "red.png" }, () => {
+                        //     jl.nav.dismissOverlayScene();
+                        //     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        //         // clear the pausescene, draw another one
+                        //         overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
+                        //             jl.nav.dismissOverlayScene();
+                        //             return true;
+                        //         });
+                        //         overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "This is a second pause scene!");
+                        //     });
+                        //     return true;
+                        // });
+                    });
+                    return true;
+                //});
+            };
+        trigger.setHeroCollisionCallback(lc);
+        // No transfer of momeuntum when the hero collides with the trigger
+        trigger.setCollisionsEnabled(false);
+
+    }
+    
+    // Show how to make an "infinite" level, and add a foreground layer
+    else if (index == 1) {
+        // set up a standard side scroller with tilt, but make it really really long:
+        jl.world.setCameraBounds(300000, 9);
+        jl.world.resetGravity(0, 10);
+        welcomeMessage(jl, "Press to make the hero go up");
+        winMessage(jl, "Great Job");
+        loseMessage(jl, "Try Again");
+        jl.world.drawBoundingBox(0, 0, 300000, 9, "", 0, 0, 0);
+
+        // make a hero
+        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
+        jl.world.setCameraChase(h);
+        h.setAbsoluteVelocity(5, 0);
+        h.disableRotation();
+        h.setPhysics(.1, 0, 0);
+
+        // touching the screen makes the hero go upwards
+        jl.hud.addToggleButton({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.makeYMotionAction(h, -5), jl.hud.makeYMotionAction(h, 0));
+
+        // set up our background, with a few layers
+        jl.world.setBackgroundColor(0x000000);
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 1);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+        // we win by collecting 10 goodies...
+        jl.score.setVictoryGoodies(10, 0, 0, 0);
+        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => jl.score.getGoodies1() + " goodies");
+
+        // now set up an obstacle and attach a callback to it
+        //
+        // Note that the obstacle needs to be final or we can't access it within the callback
+        let trigger = jl.world.makeObstacle({ box: true, x: 16, y: 5, width: 2, height: 2, img: "question_box.png" });
+        let lc =
+            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
+            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
+            // Also move the obstacle forward, so we can hit it again.
+            (thisActor: Obstacle, collideActor: Hero) => {
+                // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
+                //jl.world.makeEnemy({ x: trigger.getXPosition() + 8 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "redball.png" });
+                //jl.world.makeGoodie({ x: trigger.getXPosition() + 9 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "blueball.png" });
+                // move the trigger so we can hit it again
+                //trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
+
+                 // Create a pause scene that has a back button on it, and a button
+        // for pausing the level
+                //jl.hud.addTapControl({ x: 0, y: 0, width: 1, height: 1, img: "red.png" }, (hudX: number, hudY: number) => {
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
+                        
+                        overlay.addTapControl({ x: 3.05, y: 1.10, width: 10, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.nav.doChooser(1);
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 1.50, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "Question 1");
+                    
+                        overlay.addTapControl({ x: 3, y: 3.5, width: 10.00, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            //jl.nav.doChooser(1);
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 3.85, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #1");
+
+                        overlay.addTapControl({ x: 3, y: 4.75, width: 10, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.score.winLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 5.10, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #2");
+
+                        overlay.addTapControl({ x: 3, y: 6.00, width: 10, height: 1.2, img: "answer_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            jl.nav.dismissOverlayScene();
+                           // jl.score.winLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 6.36, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #3");
+
+                        overlay.addTapControl({ x: 3, y: 7.25, width: 10, height: 1.2, img: "answer_bar.png" }, () => {
+                            jl.nav.dismissOverlayScene();
+                            //jl.score.loseLevel();
+                            return true;
+                        });
+                        overlay.addText({ center: false, x: 3.4, y: 7.6, face: "Arial", color: "#000000", size: 32, z: 0 }, () => "answer #4");
+
+                        // overlay.addTapControl({ x: 7, y: 1, width: 1, height: 1, img: "red.png" }, () => {
+                        //     jl.nav.dismissOverlayScene();
+                        //     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        //         // clear the pausescene, draw another one
+                        //         overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
+                        //             jl.nav.dismissOverlayScene();
+                        //             return true;
+                        //         });
+                        //         overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "This is a second pause scene!");
+                        //     });
+                        //     return true;
+                        // });
+                    });
+                    return true;
+                //});
+            };
+        trigger.setHeroCollisionCallback(lc);
+        // No transfer of momeuntum when the hero collides with the trigger
+        trigger.setCollisionsEnabled(false);
     }
 
     // In the last level, the green ball could go off screen.  In this level, we draw a bounding box around the level so
     // that can't happen.  We also use a welcome message to put some text on the screen when the level starts.
-    else if (index == 2) {
+    else if (index == 24) {
         // start by setting everything up just like in level 1
         jl.world.enableTilt(10, 10);
         let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
@@ -75,7 +286,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     }
 
     // In this level, we change the physics from level 2 so that things roll and bounce a little bit more nicely.
-    else if (index == 3) {
+    else if (index == 86) {
         // start by setting everything up just like in level 2
         jl.world.enableTilt(10, 10);
         let h = jl.world.makeHero({ x: 2, y: 3, width: .75, height: .75, img: "greenball.png" });
@@ -857,7 +1068,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // This level shows how we can use "poking" to move obstacles. In this case, pressing an
     // obstacle selects it, and pressing the screen moves the obstacle to that location.
     // Double-tapping an obstacle removes it.
-    else if (index == 24) {
+    else if (index == 2) {
         // start with a hero who is controlled via Joystick, and a destination
         jl.world.drawBoundingBox(0, 0, 16, 9, "", 1, .3, 1);
         let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
@@ -3126,7 +3337,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
 
 
     // Demonstrate that we can have callback buttons on PauseScenes
-    else if (index == 86) {
+    else if (index == 3) {
         jl.world.enableTilt(10, 10);
         welcomeMessage(jl, "Interactive Pause Scenes (click the red square)");
         winMessage(jl, "Great Job");
@@ -3270,55 +3481,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         jl.score.setVictoryDestination(1);
     }
 
-    // Show how to make an "infinite" level, and add a foreground layer
-    else if (index == 90) {
-        // set up a standard side scroller with tilt, but make it really really long:
-        jl.world.setCameraBounds(300000, 9);
-        jl.world.resetGravity(0, 10);
-        welcomeMessage(jl, "Press to make the hero go up");
-        winMessage(jl, "Great Job");
-        loseMessage(jl, "Try Again");
-        jl.world.drawBoundingBox(0, 0, 300000, 9, "", 0, 0, 0);
-
-        // make a hero
-        let h = jl.world.makeHero({ x: .25, y: 5.25, width: .75, height: .75, img: "greenball.png" });
-        jl.world.setCameraChase(h);
-        h.setAbsoluteVelocity(5, 0);
-        h.disableRotation();
-        h.setPhysics(.1, 0, 0);
-
-        // touching the screen makes the hero go upwards
-        jl.hud.addToggleButton({ x: 0, y: 0, width: 16, height: 9, img: "" }, jl.hud.makeYMotionAction(h, -5), jl.hud.makeYMotionAction(h, 0));
-
-        // set up our background, with a few layers
-        jl.world.setBackgroundColor(0x17B4FF);
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "back.png" }, 1);
-        jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 5, width: 16, height: 2.8, img: "front.png" }, -.5);
-
-        // we win by collecting 10 goodies...
-        jl.score.setVictoryGoodies(10, 0, 0, 0);
-        jl.hud.addText({ x: 1, y: 1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => jl.score.getGoodies1() + " goodies");
-
-        // now set up an obstacle and attach a callback to it
-        //
-        // Note that the obstacle needs to be final or we can't access it within the callback
-        let trigger = jl.world.makeObstacle({ box: true, x: 16, y: 0, width: 1, height: 9, img: "" });
-        let lc =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                // make a random enemy and a random goodie.  Put them in X coordinates relative to the trigger
-                jl.world.makeEnemy({ x: trigger.getXPosition() + 8 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "redball.png" });
-                jl.world.makeGoodie({ x: trigger.getXPosition() + 9 + jl.getRandom(10), y: jl.getRandom(8), width: .5, height: .5, img: "blueball.png" });
-                // move the trigger so we can hit it again
-                trigger.setPosition(trigger.getXPosition() + 16, trigger.getYPosition());
-            };
-        trigger.setHeroCollisionCallback(lc);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger.setCollisionsEnabled(false);
-    }
+    
 
     // JetLag has limited support for SVG. If you draw a picture in Inkscape or another SVG
     // tool, and it only consists of lines, then you can import it into your game as a set of
@@ -3430,6 +3593,22 @@ export function welcomeMessage(jl: JetLagApi, message: string) {
     // Note: '\n' means insert a line break into the text.
     jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
         overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
+            jl.nav.dismissOverlayScene();
+            return true;
+        });
+        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+    });
+}
+
+export function questionScreen(jl: JetLagApi, message: string) {
+    // this next line can be confusing.  We are going to put some text in the middle of the
+    // pre-scene, so it is centered at (8, 4.5).  The text will be white (#FFFFF) because
+    // the default pre-scene background is black, size 32pt.  The rest of the line provides
+    // some power that we don't take advantage of yet.
+    //
+    // Note: '\n' means insert a line break into the text.
+    jl.nav.setWelcomeSceneBuilder((overlay: OverlayApi) => {
+        overlay.addTapControl({ x: 0, y: 0, width: 10, height: 5, img: "black.png" }, () => {
             jl.nav.dismissOverlayScene();
             return true;
         });
